@@ -1,156 +1,253 @@
-# PawTrace - Social Media for Stray Animals 🐾
+# 🐾 PawTrace - Social Media for Stray Animals
 
-A comprehensive social media platform dedicated to stray animals, where users can track, feed, and share their interactions with street dogs, cats, and other animals.
+A beautiful ocean-themed social media platform dedicated to stray animals, where users can track, feed, and share their interactions with street animals.
 
-## Features 🌟
+## 🌟 Features
 
 ### 🐾 Animal Management
 - Add and track stray animals in your area
-- Upload photos and set avatars for each animal
+- Beautiful avatar creator with emojis and accessories
 - Record location, favorite food, and personality traits
 - Follow specific animals and get updates
 
-### 📱 Social Media Features
+### 🌊 Ocean Theme UI
+- Stunning ocean-themed interface with floating sea creatures
+- Smooth animations and transitions
+- Avatar design system with accessories and animal friends
+- Mobile-responsive design
+
+### 📱 Social Features
 - Create posts with photos and videos
 - Tag animals in your posts
 - Like and comment on posts
-- Create reels (short videos)
 - Location-based posts
 
-### 🔥 GitHub-like Streaks System
+### 🔥 Streaks System
 - Track feeding streaks for each animal
-- Current streak and longest streak tracking
 - Visual feed history calendar
 - Reputation points for consistent feeding
 
-### 👥 Social Networking
+### 👥 Community
 - Connect with other animal lovers
-- Send and accept friend requests
 - Build a community of animal caregivers
 - Share experiences and tips
 
-### 💰 Donation System
-- Support other caregivers financially
-- Send donations for specific animals
-- Track total donations received
-- Build reputation through contributions
+## 🚀 Quick Setup Guide
 
-### 🏆 Reputation & Leaderboard
-- Earn reputation points for activities
-- Compete on leaderboards
-- Track your impact over time
-- Become recognized in the community
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB (optional - works without it for demo)
 
-## API Endpoints
+### Step 1: Clone & Install
+```bash
+# Clone the repository
+git clone https://github.com/Anannya-Vyas/PawTrace-App.git
+cd PawTrace-App
 
-### Authentication
-- `POST /register` - Register new user
-- `POST /login` - User login
-- `GET /profile` - Get user profile (protected)
+# Install dependencies
+npm install
+```
 
-### Animals
-- `POST /animals` - Add new animal (with photo upload)
-- `GET /animals` - Get all animals
-- `GET /animals/:id/feeds` - Get feeding history for animal
+### Step 2: Environment Setup
+```bash
+# Create .env file
+touch .env
 
-### Feeding & Streaks
-- `POST /feed` - Log feeding activity (with photo)
-- `GET /streaks` - Get user's feeding streaks
+# Add these lines to .env
+MONGO_URI=mongodb+srv://pawtrace:avyas524@cluster1.tchfipc.mongodb.net/pawtrace?retryWrites=true&w=majority
+JWT_SECRET=supersecretkey123
+```
 
-### Posts & Social
-- `POST /posts` - Create post (with media upload)
-- `GET /posts` - Get all posts
-- `POST /posts/:id/like` - Like/unlike post
-- `POST /posts/:id/comment` - Add comment
+### Step 3: Start the Application
+```bash
+# Start the backend server
+node app.js
 
-### Connections
-- `POST /connect` - Send friend request
-- `PUT /connect/:id` - Accept/reject connection
+# Server will start on port 5000
+# Open your browser and go to: http://localhost:5000/pawtrace-ultimate.html
+```
 
-### Donations
-- `POST /donate` - Send donation to user
+## 🌐 Access Points
 
-### Leaderboard
-- `GET /leaderboard` - Get top users and popular animals
+### Main Application
+- **URL**: http://localhost:5000/pawtrace-ultimate.html
+- **Features**: Registration, Login, Avatar Creator, Animal Management
 
-### File Upload
-- `POST /upload` - Upload files (photos/videos)
+### Backend API
+- **Base URL**: http://localhost:5000
+- **Status**: http://localhost:5000/ (should show "PawTrace Backend Running 🐶🔥")
 
-## Tech Stack 🛠️
+## 📱 How to Use
 
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB with Mongoose
-- **Authentication**: JWT tokens
-- **File Upload**: Multer
-- **Security**: bcryptjs for password hashing
+### 1. Registration
+- Fill in your details (name, phone, password)
+- Select your favorite animals
+- Design your avatar with accessories
+- Click "Create Account"
 
-## Getting Started 🚀
+### 2. Login
+- Enter your phone number and password
+- Click "Sign In"
 
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Create `.env` file with:
-   ```
-   MONGO_URI=your_mongodb_connection_string
-   JWT_SECRET=your_jwt_secret
-   ```
-4. Start the server: `npm run dev`
-5. Server runs on port 5000
+### 3. Avatar Creator
+- Choose base avatar
+- Add accessories (hats, glasses, etc.)
+- Add animal friends
+- Save your design
 
-## File Upload 📸
+### 4. Animal Management
+- Add new animals to track
+- Upload photos
+- Set favorite foods and locations
+- Track feeding activities
 
-- Photos and videos are stored in `/uploads` directory
-- Supported formats: jpeg, jpg, png, gif, mp4, mov, avi, webm
-- Maximum file size: 50MB
-- Files are served statically at `/uploads`
+## 🛠️ Tech Stack
 
-## Database Models
+### Backend
+- **Node.js** - Server runtime
+- **Express.js** - Web framework
+- **MongoDB** - Database (optional)
+- **JWT** - Authentication tokens
+- **Multer** - File uploads
+- **bcryptjs** - Password hashing
 
-### User
-- Basic info (name, email, password)
-- Extended profile (bio, avatar, reputation)
-- Statistics (animals added, feeds, donations)
-- Friends list
+### Frontend
+- **HTML5** - Structure
+- **CSS3** - Styling with animations
+- **JavaScript** - Interactivity
+- **LocalStorage** - Session management
 
-### Animal
-- Basic info (name, type, location)
-- Extended details (favorite food, personality)
-- Media (photo, avatar)
-- Statistics (total feeds, popularity)
-- Followers
+## 📁 Project Structure
 
-### Post
-- Social media posts with media
-- Tagged animals
-- Likes and comments
-- Reel support
+```
+PawTrace-App/
+├── app.js                 # Main server file
+├── package.json           # Dependencies
+├── .env                   # Environment variables
+├── .gitignore            # Git ignore file
+├── models/               # Database models
+│   ├── User.js
+│   ├── Animal.js
+│   └── ...
+├── middleware/           # Authentication & uploads
+│   ├── auth.js
+│   └── upload.js
+├── public/               # Frontend files
+│   ├── pawtrace-ultimate.html
+│   └── app-ultimate.js
+├── uploads/             # File uploads (auto-created)
+└── README.md            # This file
+```
 
-### Streak
-- GitHub-like feeding streaks
-- Current and longest streak tracking
-- Feed history
+## 🔧 Development Commands
 
-### Connection
-- Friend request system
-- Status tracking (pending, accepted, rejected)
+### Start Development Server
+```bash
+node app.js
+```
 
-### Donation
-- Financial support system
-- Animal-specific donations
-- Message support
+### Check Server Status
+```bash
+curl http://localhost:5000/
+```
 
-## Reputation System 🏅
+### Test Registration
+```bash
+curl -X POST http://localhost:5000/register \
+  -H "Content-Type: application/json" \
+  -d '{"fullName":"Test User","phoneNumber":"+911234567890","password":"123456","confirmPassword":"123456"}'
+```
 
-- **Add animal**: +10 points
-- **Create post**: +5 points
-- **Feed animal**: +3 points
-- **Like post**: +1 point
-- **Comment**: +2 points
-- **Receive donation**: +1 point per $10
+### Test Login
+```bash
+curl -X POST http://localhost:5000/login \
+  -H "Content-Type: application/json" \
+  -d '{"phoneNumber":"+911234567890","password":"123456"}'
+```
 
-## Contributing 🤝
+## 🐛 Troubleshooting
 
-This is a social impact project aimed at helping stray animals. Contributions are welcome!
+### Server Not Starting
+```bash
+# Check if port 5000 is in use
+netstat -an | findstr :5000
 
-## License 📄
+# Kill process on port 5000 (Windows)
+taskkill /PID <process_id> /F
+```
+
+### MongoDB Connection Issues
+- The app works without MongoDB for demo purposes
+- For full functionality, ensure MongoDB URI is correct in .env
+- Check network connectivity to MongoDB Atlas
+
+### Frontend Not Loading
+- Ensure backend server is running
+- Check browser console for errors (F12)
+- Verify file paths in HTML
+
+### Registration/Login Not Working
+- Check server logs in terminal
+- Open browser console (F12) for error messages
+- Test with the "🧪 Test Server" button
+
+## 🌟 Current Features Status
+
+### ✅ Working Features
+- [x] Beautiful ocean-themed UI
+- [x] User registration (phone-based)
+- [x] User login
+- [x] Avatar creator with accessories
+- [x] Animal selection system
+- [x] Mock authentication (no database required)
+- [x] Responsive design
+- [x] Smooth animations
+
+### 🔄 In Progress
+- [ ] Real MongoDB integration
+- [ ] Animal management system
+- [ ] Feeding streaks
+- [ ] Social features (posts, likes, comments)
+- [ ] File upload system
+
+### 📋 Planned Features
+- [ ] Real-time notifications
+- [ ] GPS-based animal tracking
+- [ ] Donation system
+- [ ] Community features
+- [ ] Mobile app
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
 
 MIT License - feel free to use this project for animal welfare initiatives.
+
+## 🌟 Why This Project?
+
+This project aims to help stray animals by:
+- Creating a community of animal caregivers
+- Tracking feeding schedules and locations
+- Building awareness about stray animals
+- Encouraging community participation
+- Providing tools for animal welfare
+
+## 📞 Support
+
+If you face any issues:
+1. Check the troubleshooting section above
+2. Look at the browser console (F12) for errors
+3. Check the server terminal for error messages
+4. Test with the provided curl commands
+
+---
+
+**Made with ❤️ for stray animals everywhere** 🐾
+
+**GitHub Repository**: https://github.com/Anannya-Vyas/PawTrace-App
