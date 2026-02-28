@@ -53,7 +53,7 @@ app.post("/test-register", async (req, res) => {
 })
 
 /* =========================
-   REGISTER USER (Simple Version - No MongoDB)
+   REGISTER USER (MongoDB Version)
 ========================= */
 app.post("/register", async (req, res) => {
   try {
@@ -73,25 +73,44 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Password must be at least 6 characters" })
     }
 
-    // For now, just return success without MongoDB
-    const mockUser = {
-      id: Date.now(),
+    // Check if phone number already exists in MongoDB
+    const existingUser = await User.findOne({ phoneNumber })
+    if (existingUser) {
+      return res.status(400).json({ message: "An account with this phone number already exists" })
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10)
+
+    // Create new user in MongoDB
+    const newUser = new User({
       fullName,
       nickname: nickname || fullName,
       profession,
       phoneNumber,
-      favoriteAnimals: favoriteAnimals || [],
-      reputation: 0,
-      createdAt: new Date().toISOString()
-    }
+      password: hashedPassword,
+      favoriteAnimals: favoriteAnimals || []
+    })
 
-    const mockToken = "mock-jwt-token-" + Date.now();
+    await newUser.save()
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
     console.log('Registration successful for:', phoneNumber);
     res.status(201).json({
       message: "User registered successfully",
-      user: mockUser,
-      token: mockToken
+      user: {
+        id: newUser._id,
+        fullName: newUser.fullName,
+        nickname: newUser.nickname,
+        profession: newUser.profession,
+        phoneNumber: newUser.phoneNumber,
+        favoriteAnimals: newUser.favoriteAnimals,
+        reputation: newUser.reputation,
+        createdAt: newUser.createdAt
+      },
+      token
     })
 
   } catch (error) {
@@ -101,7 +120,7 @@ app.post("/register", async (req, res) => {
 })
 
 /* =========================
-   LOGIN USER (Simple Version - No MongoDB)
+   LOGIN USER (MongoDB Version)
 ========================= */
 app.post("/login", async (req, res) => {
   try {
@@ -112,25 +131,39 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Please enter phone number and password" })
     }
 
-    // For now, just accept any login (mock authentication)
-    const mockUser = {
-      id: Date.now(),
-      fullName: "Test User",
-      nickname: "Test",
-      profession: "Animal Lover",
-      phoneNumber,
-      favoriteAnimals: ["dog", "cat"],
-      reputation: 10,
-      createdAt: new Date().toISOString()
+    // Find user in MongoDB
+    const user = await User.findOne({ phoneNumber })
+    if (!user) {
+      return res.status(400).json({ message: "User not found" })
     }
 
-    const mockToken = "mock-jwt-token-" + Date.now();
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password)
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" })
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    )
 
     console.log('Login successful for:', phoneNumber);
     res.json({
       message: "Login successful",
-      user: mockUser,
-      token: mockToken
+      user: {
+        id: user._id,
+        fullName: user.fullName,
+        nickname: user.nickname,
+        profession: user.profession,
+        phoneNumber: user.phoneNumber,
+        favoriteAnimals: user.favoriteAnimals,
+        reputation: user.reputation,
+        createdAt: user.createdAt
+      },
+      token
     })
 
   } catch (error) {

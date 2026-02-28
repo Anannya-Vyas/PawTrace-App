@@ -826,34 +826,67 @@ function loadProfileData() {
     document.getElementById('profileNickname').value = currentUser.nickname || '';
     document.getElementById('profileProfession').value = currentUser.profession || '';
 }
-
 function displayAnimals() {
     const container = document.getElementById('animalsList');
     if (!container) return;
-    
-    if (animals.length === 0) {
-        container.innerHTML = '<div class="card-3d"><p style="text-align: center; color: rgba(255,255,255,0.8); font-size: 18px;">🐾 No animal friends yet. Add your first friend!</p></div>';
+
+    if (!animals || animals.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.8); font-size: 18px;">🍃 No animals added yet.</p>';
         return;
     }
-    
-    container.innerHTML = animals.map(animal => `
-        <div class="card-3d">
-            <div style="display: flex; align-items: center; gap: 30px; margin-bottom: 25px;">
-                ${animal.photo ? `<img src="${animal.photo}" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 3px solid rgba(255,255,255,0.3);">` : 
-                `<div style="width: 100px; height: 100px; border-radius: 50%; background: linear-gradient(135deg, #ff6b6b, #feca57); display: flex; align-items: center; justify-content: center; font-size: 40px; border: 3px solid rgba(255,255,255,0.3);">${animal.emoji}</div>`}
-                <div style="flex: 1;">
-                    <h3 style="color: white; margin-bottom: 15px; font-size: 24px;">${animal.name}</h3>
-                    <p style="color: rgba(255,255,255,0.9); margin-bottom: 8px; font-size: 16px;">${animal.type} • ${animal.location}</p>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 14px;">${animal.description || 'No description'}</p>
-                    ${animal.favoriteFood ? `<p style="color: #feca57; font-size: 16px; margin-top: 10px;">🍖 Favorite: ${animal.favoriteFood}</p>` : ''}
-                </div>
+
+    container.innerHTML = animals.map(a => `
+        <div style="background: rgba(255,255,255,0.06); border-radius: 16px; padding: 18px; margin-bottom: 14px; display:flex; gap:16px; align-items:center;">
+            <div style="width:64px; height:64px; border-radius:12px; overflow:hidden; background:linear-gradient(135deg,#ff9a9e,#fecfef); display:flex;align-items:center;justify-content:center;font-size:32px;">${a.emoji || getAnimalEmoji(a.type)}</div>
+            <div style="flex:1;">
+                <div style="color:white;font-weight:600;font-size:16px;margin-bottom:6px;">${a.name}</div>
+                <div style="color:rgba(255,255,255,0.75);font-size:13px;">${a.type || 'Unknown'} • ${a.location || 'Unknown location'}</div>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.1);">
-                <div style="color: rgba(255,255,255,0.9); font-size: 16px;">🍖 ${animal.totalFeeds} feeds</div>
-                <div style="color: rgba(255,255,255,0.9); font-size: 16px;">${animal.lastFed ? 'Last fed: ' + formatDate(animal.lastFed) : 'Never fed'}</div>
-            </div>
+            <div style="color:rgba(255,255,255,0.75);font-size:13px;">Feeds: ${a.totalFeeds || 0}</div>
         </div>
     `).join('');
+}
+
+function displayCommunity() {
+    const container = document.getElementById('communityUsers');
+    if (!container) return;
+
+    container.innerHTML = '<p style="color: rgba(255,255,255,0.7)">Loading community...</p>';
+
+    fetch('/leaderboard')
+        .then(res => res.json())
+        .then(data => {
+            const users = (data && data.topUsers) ? data.topUsers : [];
+
+            if (!users.length) {
+                container.innerHTML = '<p style="color: rgba(255,255,255,0.7)">No community members yet.</p>';
+                return;
+            }
+
+            container.innerHTML = users.map(user => {
+                const avatar = user.avatar || '👤';
+                const name = user.fullName || user.name || 'Unknown';
+                const animalsCount = user.totalAnimalsAdded || user.totalAnimals || 0;
+                const feeds = user.totalFeeds || 0;
+                const rep = user.reputation || 0;
+                const level = rep >= 500 ? 'Platinum' : (rep >= 200 ? 'Gold' : (rep >= 50 ? 'Silver' : 'Bronze'));
+
+                return `
+        <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;">
+            <div style="width:52px; height:52px; border-radius:50%; display:flex;align-items:center;justify-content:center;font-size:22px; background:linear-gradient(135deg,#667eea,#764ba2);">${avatar}</div>
+            <div style="flex:1;">
+                <div style="color:white;font-weight:600;font-size:15px;">${name}</div>
+                <div style="color:rgba(255,255,255,0.8);font-size:13px;">🐾 ${animalsCount} animals • 🍖 ${feeds} feeds</div>
+            </div>
+            <div style="color:#feca57;font-weight:600;">⭐ ${level}</div>
+        </div>
+    `;
+            }).join('');
+        })
+        .catch(err => {
+            console.error('Failed to load leaderboard:', err);
+            container.innerHTML = '<p style="color: rgba(255,255,255,0.7)">Unable to load community.</p>';
+        });
 }
 
 function updateFeedSelect() {
@@ -890,7 +923,7 @@ function displayFeedLogs() {
 
 function displayRecentActivity() {
     const container = document.getElementById('recentActivity');
-    if (!container) return;
+
     
     const recentActivities = feedLogs.slice(0, 5);
     
@@ -959,14 +992,7 @@ function displayCommunity() {
     const container = document.getElementById('communityUsers');
     if (!container) return;
     
-    // Mock community data - in real app, this would come from backend
-    const communityUsers = [
-        { name: 'Sarah Johnson', animals: 5, feeds: 120, avatar: '👩', level: 'Gold' },
-        { name: 'Mike Chen', animals: 3, feeds: 85, avatar: '👨', level: 'Silver' },
-        { name: 'Emma Wilson', animals: 8, feeds: 200, avatar: '👩', level: 'Platinum' },
-        { name: 'John Davis', animals: 4, feeds: 95, avatar: '👨', level: 'Silver' },
-        { name: 'Lisa Martinez', animals: 6, feeds: 150, avatar: '👩', level: 'Gold' }
-    ];
+    const communityUsers = [];
     
     container.innerHTML = communityUsers.map(user => `
         <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 25px; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 20px; transition: all 0.3s ease;" 
@@ -1049,6 +1075,39 @@ function updateCurrentStreak() {
     }
     
     userStats.currentStreak = streak;
+}
+
+function displayCommunity() {
+    const container = document.getElementById('communityUsers');
+    if (!container) return;
+
+    container.innerHTML = '<p style="color: rgba(255,255,255,0.7)">Loading community...</p>';
+
+    fetch('/leaderboard')
+        .then(res => res.json())
+        .then(data => {
+            const users = (data && data.topUsers) ? data.topUsers : [];
+
+            if (!users.length) {
+                container.innerHTML = '<p style="color: rgba(255,255,255,0.7)">No community members yet.</p>';
+                return;
+            }
+
+            container.innerHTML = users.map(user => {
+                const avatar = user.avatar || '👤';
+                const name = user.fullName || user.name || 'Unknown';
+                const animalsCount = user.totalAnimalsAdded || user.totalAnimals || 0;
+                const feeds = user.totalFeeds || 0;
+                const rep = user.reputation || 0;
+                const level = rep >= 500 ? 'Platinum' : (rep >= 200 ? 'Gold' : (rep >= 50 ? 'Silver' : 'Bronze'));
+
+                return `\n        <div style="background: rgba(255,255,255,0.08); border-radius: 20px; padding: 20px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px;">\n            <div style="width:52px; height:52px; border-radius:50%; display:flex;align-items:center;justify-content:center;font-size:22px; background:linear-gradient(135deg,#667eea,#764ba2);">${avatar}</div>\n            <div style="flex:1;">\n                <div style="color:white;font-weight:600;font-size:15px;">${name}</div>\n                <div style="color:rgba(255,255,255,0.8);font-size:13px;">🐾 ${animalsCount} animals • 🍖 ${feeds} feeds</div>\n            </div>\n            <div style="color:#feca57;font-weight:600;">⭐ ${level}</div>\n        </div>\n    `;
+            }).join('');
+        })
+        .catch(err => {
+            console.error('Failed to load leaderboard:', err);
+            container.innerHTML = '<p style="color: rgba(255,255,255,0.7)">Unable to load community.</p>';
+        });
 }
 
 function showToast(message, type = 'info') {
